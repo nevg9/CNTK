@@ -1569,7 +1569,7 @@ void CNTKToONNXHelper::PrepareLSTMPeepholeNode(LotusIR::Graph* graph,
     std::vector<int> shape({ directions, 3 * hidden_size });
     onnx::TypeProto inputArgType = ToTypeProto(shape, doReverseVec);
     UpdateONNXType(Ps[0].GetDataType(), inputArgType);
-    LotusIR::NodeArg& inputArg = graph->GetOrCreateNodeArg(ToString(Ps[0].Uid()), &inputArgType);
+    LotusIR::NodeArg& inputArg = graph->GetOrCreateNodeArg(ToLegacyString(ToUTF8(Ps[0].Uid())), &inputArgType);
     std::vector<LotusIR::NodeArg *> varOutputs({ &inputArg });
     std::vector<LotusIR::NodeArg *> varInputs;
     std::string inputName = inputArg.Name();
@@ -1625,7 +1625,7 @@ void CNTKToONNXHelper::PrepareLSTMBiasNode(LotusIR::Graph* graph, std::unordered
     shape[1] *= 2;
     onnx::TypeProto inputArgType = ToTypeProto(shape, doReverseVec);
     UpdateONNXType(Bs[0].GetDataType(), inputArgType);
-    LotusIR::NodeArg &inputArg = graph->GetOrCreateNodeArg(ToString(Bs[0].Uid()), &inputArgType);
+    LotusIR::NodeArg &inputArg = graph->GetOrCreateNodeArg(ToLegacyString(ToUTF8(Bs[0].Uid())), &inputArgType);
     std::vector<LotusIR::NodeArg*> varOutputs({ &inputArg });
     std::vector<LotusIR::NodeArg*> varInputs;
     std::string inputName = inputArg.Name();
@@ -1658,7 +1658,7 @@ void CNTKToONNXHelper::PrepareLSTMWeightNode(LotusIR::Graph* graph, std::unorder
     std::vector<int> shape = Cast<size_t, int>((NDShape({ Ws.size() }).AppendShape(Ws[0].Shape())).Dimensions());
     onnx::TypeProto inputArgType = ToTypeProto(shape, doReverseVec);
     UpdateONNXType(Ws[0].GetDataType(), inputArgType);
-    LotusIR::NodeArg &inputArg = graph->GetOrCreateNodeArg(ToString(Ws[0].Uid()), &inputArgType);
+    LotusIR::NodeArg &inputArg = graph->GetOrCreateNodeArg(ToLegacyString(ToUTF8(Ws[0].Uid())), &inputArgType);
     std::vector<LotusIR::NodeArg *> varOutputs({&inputArg});
     std::vector<LotusIR::NodeArg *> varInputs;
     std::string inputName = inputArg.Name();
@@ -1907,7 +1907,7 @@ LotusIR::Node* CNTKToONNXHelper::CreateLSTMNode(const FunctionPtr &src,
     if (Xs[0].Owner().get() != nullptr)
         CreateNode(Xs[0].Owner(), graph, functionNodes, variableNodes, compositeOutputsMap);
 
-    auto nodeName = src->Name().empty() ? ToString(src->Uid()) : ToString(src->Name());
+    auto nodeName = src->Name().empty() ? ToLegacyString(ToUTF8(src->Uid())) : ToLegacyString(ToUTF8(src->Name()));
     LotusIR::Node *lstmNode = graph->AddNode(nodeName, "LSTM", "", nodeInputs, nodeOutputs);
 
     lstmNode->AddAttribute("activations", activations);
@@ -1942,7 +1942,7 @@ void CNTKToONNXHelper::PrepareGRUBiasNode(LotusIR::Graph* graph, std::unordered_
     // ONNX GRU spec has 2 bias, for forward and backward.
     onnx::TypeProto inputArgType = ToTypeProto(shape, doReverseVec);
     UpdateONNXType(Bs[0].GetDataType(), inputArgType);
-    LotusIR::NodeArg &inputArg = graph->GetOrCreateNodeArg(ToString(Bs[0].Uid()), &inputArgType);
+    LotusIR::NodeArg &inputArg = graph->GetOrCreateNodeArg(ToLegacyString(ToUTF8(Bs[0].Uid())), &inputArgType);
     std::vector<LotusIR::NodeArg *> varOutputs({ &inputArg });
     std::vector<LotusIR::NodeArg *> varInputs;
     std::string inputName = inputArg.Name();
@@ -1970,7 +1970,7 @@ void CNTKToONNXHelper::PrepareGRUZRHWeightNode(LotusIR::Graph* graph, std::unord
     std::vector<int> shape({ numDirections, GRUWeightDimensionHiddenMultiplier * hiddenSize, hiddenSize });
     onnx::TypeProto inputArgType = ToTypeProto(shape, false);
     UpdateONNXType(Rzrs[0].GetDataType(), inputArgType);
-    LotusIR::NodeArg &inputArg = graph->GetOrCreateNodeArg(ToString(Rzrs[0].Uid()), &inputArgType);
+    LotusIR::NodeArg &inputArg = graph->GetOrCreateNodeArg(ToLegacyString(ToUTF8(Rzrs[0].Uid())), &inputArgType);
     std::vector<LotusIR::NodeArg *> varOutputs({ &inputArg });
     std::vector<LotusIR::NodeArg *> varInputs;
     std::string inputName = inputArg.Name();
@@ -2004,7 +2004,7 @@ void CNTKToONNXHelper::PrepareRNNWeightNode(LotusIR::Graph* graph, std::unordere
     std::vector<int> shape = Cast<size_t, int>((NDShape({Ws.size()}).AppendShape(Ws[0].Shape())).Dimensions());
     onnx::TypeProto inputArgType = ToTypeProto(shape, doReverseVec);
     UpdateONNXType(Ws[0].GetDataType(), inputArgType);
-    LotusIR::NodeArg &inputArg = graph->GetOrCreateNodeArg(ToString(Ws[0].Uid()), &inputArgType);
+    LotusIR::NodeArg &inputArg = graph->GetOrCreateNodeArg(ToLegacyString(ToUTF8(Ws[0].Uid())), &inputArgType);
     std::vector<LotusIR::NodeArg *> varOutputs({&inputArg});
     std::vector<LotusIR::NodeArg *> varInputs;
     std::string inputName = inputArg.Name();
@@ -2178,7 +2178,7 @@ LotusIR::Node *CNTKToONNXHelper::CreateGRUNode(const FunctionPtr &src,
     if (Xs[0].Owner().get() != nullptr)
         CreateNode(Xs[0].Owner(), graph, functionNodes, variableNodes, compositeOutputsMap);
 
-    auto nodeName = src->Name().empty() ? ToString(src->Uid()) : ToString(src->Name());
+    auto nodeName = src->Name().empty() ? ToLegacyString(ToUTF8(src->Uid())) : ToLegacyString(ToUTF8(src->Name()));
     LotusIR::Node *gruNode = graph->AddNode(nodeName, "GRU", "", nodeInputs, nodeOutputs);
 
     gruNode->AddAttribute("activations", activations);
@@ -2211,7 +2211,7 @@ void CNTKToONNXHelper::PrepareRNNBiasNode(LotusIR::Graph* graph, std::unordered_
     // ONNX GRU spec has 2 bias, for forward and backward.
     onnx::TypeProto inputArgType = ToTypeProto(shape, doReverseVec);
     UpdateONNXType(Bs[0].GetDataType(), inputArgType);
-    LotusIR::NodeArg &inputArg = graph->GetOrCreateNodeArg(ToString(Bs[0].Uid()), &inputArgType);
+    LotusIR::NodeArg &inputArg = graph->GetOrCreateNodeArg(ToLegacyString(ToUTF8(Bs[0].Uid())), &inputArgType);
     std::vector<LotusIR::NodeArg *> varOutputs({ &inputArg });
     std::vector<LotusIR::NodeArg *> varInputs;
     std::string inputName = inputArg.Name();
@@ -2363,7 +2363,7 @@ LotusIR::Node *CNTKToONNXHelper::CreateRNNNode(const FunctionPtr &src,
     if (Xs[0].Owner().get() != nullptr)
         CreateNode(Xs[0].Owner(), graph, functionNodes, variableNodes, compositeOutputsMap);
 
-    auto nodeName = src->Name().empty() ? ToString(src->Uid()) : ToString(src->Name());
+    auto nodeName = src->Name().empty() ? ToLegacyString(ToUTF8(src->Uid())) : ToLegacyString(ToUTF8(src->Name()));
     LotusIR::Node *rnnNode = graph->AddNode(nodeName, "RNN", "", nodeInputs, nodeOutputs);
 
     rnnNode->AddAttribute("activations", activations);
@@ -2499,7 +2499,7 @@ LotusIR::Node* CNTKToONNXHelper::CreateNode(const FunctionPtr& src,
         return iter->second;
 
     LotusIR::Node* functionNode = nullptr;
-    std::string cntkOpName = ToString(src->OpName());
+    std::string cntkOpName = ToLegacyString(ToUTF8(src->OpName()));
     std::string onnxOpName = ToOPName(src);
 
     // TODO: uncomment this code once bidirectional LSTM is supprted.
@@ -2718,7 +2718,7 @@ void CNTKToONNXHelper::ProcessInputs(const FunctionPtr& src,
             onnx::TypeProto shapeInputArgType = ToTypeProto(std::vector<int>({ (int)newShapeVec.size() }));
             shapeInputArgType.mutable_tensor_type()->set_elem_type(onnx::TensorProto_DataType_INT64);
 
-            LotusIR::NodeArg &shapeInputArg = graph->GetOrCreateNodeArg(ToString(src->Output().Uid()) + "_shape", &shapeInputArgType);
+            LotusIR::NodeArg &shapeInputArg = graph->GetOrCreateNodeArg(ToLegacyString(ToUTF8(src->Output().Uid())) + "_shape", &shapeInputArgType);
 
             inputs.push_back(&shapeInputArg);
 
@@ -2777,7 +2777,7 @@ void CNTKToONNXHelper::ProcessOutputs(const FunctionPtr& src,
         {
             UpdateONNXType(output.GetDataType(), outputArgType);
         }
-        LotusIR::NodeArg &outputNodeArg = graph->GetOrCreateNodeArg(ToString(output.Uid()), &outputArgType);
+        LotusIR::NodeArg &outputNodeArg = graph->GetOrCreateNodeArg(ToLegacyString(ToUTF8(output.Uid())), &outputArgType);
         outputs.emplace_back(&outputNodeArg);
     }
 }
@@ -3375,7 +3375,7 @@ LotusIR::Node* CNTKToONNXHelper::AddNode(const FunctionPtr& src, LotusIR::Graph*
 {
     LotusIR::Node* node = nullptr;
     std::vector<LotusIR::NodeArg *> orderedInputs = MapInputsOrderToONNX(src, inputs);
-    auto nodeName = src->Name().empty() ? ToString(src->Uid()) : ToString(src->Name());
+    auto nodeName = src->Name().empty() ? ToLegacyString(ToUTF8(src->Uid())) : ToLegacyString(ToUTF8(src->Name()));
 
     if (L"Embedding" == src->OpName())
     {
@@ -3737,7 +3737,7 @@ LotusIR::Node* CNTKToONNXHelper::CreateONNXNodesForOptimizedRNNStack(const Funct
         // Input operand X
         if (inputNeedsShapeAdapter)
         {
-            std::string adapterBasename = (src->Name().empty() ? ToString(src->Uid()) : ToString(src->Name())) + "_Adapter_" + std::to_string(i);
+            std::string adapterBasename = (src->Name().empty() ? ToLegacyString(ToUTF8(src->Uid())) : ToLegacyString(ToUTF8(src->Name()))) + "_Adapter_" + std::to_string(i);
             LotusIR::NodeArg* shapeAdaptedInputOperandArg = LSTMOutputShapeAdapter(*layerInputOperandArg, ornnOutputArgType, graph,
                                                                                   numDirections, hiddenSize, ornnOutput.GetDataType(), adapterBasename);
             inputs.push_back(shapeAdaptedInputOperandArg);
@@ -3759,7 +3759,7 @@ LotusIR::Node* CNTKToONNXHelper::CreateONNXNodesForOptimizedRNNStack(const Funct
         // For now, we always output Y. So this attribute value is 1.
         int64_t outputSequence = 1;
         //Note: Important to keep the output arg name the same.
-        auto outArgName = (i == numLayers - 1) ? ToString(ornnOutput.Uid()) : ToString(ornnOutput.Uid()) + "_" + std::to_string(i);
+        auto outArgName = (i == numLayers - 1) ? ToLegacyString(ToUTF8(ornnOutput.Uid())) : ToLegacyString(ToUTF8(ornnOutput.Uid())) + "_" + std::to_string(i);
         LotusIR::NodeArg &outputArg_Y = graph->GetOrCreateNodeArg(outArgName, &ornnOutputArgType);
         outputs.push_back(&outputArg_Y);
 
